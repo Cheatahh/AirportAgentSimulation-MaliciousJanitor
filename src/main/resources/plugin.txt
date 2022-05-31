@@ -1,0 +1,4 @@
+id          = MaliciousJanitor
+name        = MaliciousJanitor
+authors     = Cheatahh (Flo S)
+entrypoint  = cheatahh.se.MaliciousJanitorPlugin
