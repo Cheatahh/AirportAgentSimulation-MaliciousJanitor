@@ -1,3 +1,3 @@
 
-rootProject.name = "SE_Attacker_Janitor"
+rootProject.name = "AirportAgentSimulation-MaliciousJanitor"
 
