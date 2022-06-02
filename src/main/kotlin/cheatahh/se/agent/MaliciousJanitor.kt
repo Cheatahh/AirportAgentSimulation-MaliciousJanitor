@@ -32,7 +32,7 @@ class MaliciousJanitor(initialSpeed: Double, tilePlacingChance: String, private 
     private val placingChance = min(max(tilePlacingChance.substringBefore('%').toDoubleOrNull() ?: 10.0, 0.0), 100.0) / 100.0
 
     // The parsed SlowDownFunction, cached for faster invocation
-    private val slowDownFunction = SlowDownFunction[tileSlowDownFunction]
+    private val slowDownFunction = SlowDownFunctions[tileSlowDownFunction]
 
     // A list of excluded class types, cached for faster invocation
     private val excludedTypes = excludedEntityTypes.split(Regex("[\\s,]+")).mapNotNull { try {

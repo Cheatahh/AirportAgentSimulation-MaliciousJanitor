@@ -13,7 +13,7 @@ If an entity walks over a SlowDownTile it receives a temporary slowdown.
 - **tileLifeTime: Long** - Total amount of ticks a SlowDownTile is considered alive. After this threshold is reached, the tile will get cleared.
 - **tileSlowDownTime: Long** - Total amount of ticks a SlowDownTile can affect an entity.
 - **tileSlowDownCoolDown: Long** - Total amount of ticks an entity cannot be affected by the same SlowDownTile, after it has been slowed down.
-- **tileSlowDownFunction: String** Function to determine the actual speed amplifier at a given point in time. Example values are "42%" or "linear".
+- **tileSlowDownFunction: String** Function to determine the actual speed amplifier at a given point in time. Possible values are "exponential", "exponentialInverted", "linear", "cubic", "cubicInverted" or any percentages like for example "42%".
 - **excludedEntityTypes: String** A list of entity types (qualified names) to be excluded by the SlowDownTiles, delimited by whitespaces and/or commas.
 
 The compiled jar can be found in `out/artifacts`.
