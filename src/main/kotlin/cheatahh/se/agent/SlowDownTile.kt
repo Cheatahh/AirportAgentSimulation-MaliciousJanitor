@@ -1,14 +1,10 @@
 package cheatahh.se.agent
 
-import cheatahh.se.util.speedAmplifierOffset
-import cheatahh.se.util.unsafe
+import cheatahh.se.util.runInjected
 import dhbw.sose2022.softwareengineering.airportagentsim.simulation.api.simulation.entity.MovingEntity
 import dhbw.sose2022.softwareengineering.airportagentsim.simulation.api.simulation.entity.StaticEntity
 import kotlin.math.max
 import kotlin.math.min
-
-// All entities claimed by SlowDownTiles
-private val claimedEntities = mutableMapOf<MovingEntity, SlowDownTile.SlowDownEffect>()
 
 /**
  * The [SlowDownTile] Entity, described in [MaliciousJanitor]
@@ -18,6 +14,12 @@ internal class SlowDownTile(private val lifeTime: Long, private val slowDownTime
     // The ticks since this tile is alive. If this value is larger than [lifeTime] the tile will kill itself
     private var aliveTicks = 0L
 
+    // All entities affected by this SlowDownTile
+    private val slowDownEffectEntities = hashSetOf<SlowDownEffect>()
+
+    // Unique speedAmplifierKey for this SlowDownTile
+    private val identitySpeedAmplifier = "slowDownTileSpeedAmplifier${System.identityHashCode(this)}"
+
     override fun onBirth() {
         isSolid = false // This entity is non-solid. It will not take part in collision detections to allow entities to enter the tile
     }
@@ -25,46 +27,56 @@ internal class SlowDownTile(private val lifeTime: Long, private val slowDownTime
     override fun pluginUpdate() {
 
         // Check whether the entity should be killed
-        if(aliveTicks++ >= lifeTime) return kill()
+        if(aliveTicks++ >= lifeTime && slowDownEffectEntities.isEmpty()) return world.runInjected(this) {
+            kill()
+        }
 
         // Acquire all entities on top of this tile
-        for(entity in world.entities) {
-            if(entity.position != position || entity !is MovingEntity || entity.javaClass in excludedTypes || entity.isDead || !entity.isSolid || claimedEntities[entity]?.owner === this) continue
-            // Claim this entity, any claims by other SlowDownTiles will be dropped
-            claimedEntities[entity] = SlowDownEffect()
+        if(aliveTicks < lifeTime) for(entity in world.entities) {
+
+            if(entity.position != position || entity !is MovingEntity || entity.javaClass in excludedTypes || entity.isDead || !entity.isSolid) continue
+
+            // Tries to add this entity to the affection set, silently fails if this entity is already present
+            slowDownEffectEntities += SlowDownEffect(entity)
         }
 
         // Iterate over all claimed entities and apply the speedAmplifier attribute
-        val iterator = claimedEntities.iterator()
-        for((entity, effect) in iterator) {
-            // Discard entities owned by other tiles
-            if(effect.owner !== this) continue
-
-            // Evaluate the current effect state of this entity
-            val effectTicks = effect.slowDownTicks++
-            if(effectTicks == slowDownTime) {
-                // Entity is no longer slowed down
-                unsafe.putDouble(entity, speedAmplifierOffset, 1.0)
-            } else if(effectTicks > slowDownTime) {
-                // Entity is in coolDown phase
-                if(effectTicks >= slowDownTime + coolDownTime) iterator.remove()
-            } else {
-                // Entity is slowed down
-                // A new speedAmplifier will be evaluated and applied
-                unsafe.putDouble(entity,
-                    speedAmplifierOffset,
-                    min(max(slowDownFunction(effect.slowDownTicks.toDouble() / slowDownTime), 0.0), 1.0)
-                )
+        if(slowDownEffectEntities.isNotEmpty()) {
+            val iterator = slowDownEffectEntities.iterator()
+            for(effect in iterator) {
+                // Evaluate the current effect state of this entity
+                val effectTicks = effect.slowDownTicks++
+                if(effectTicks == slowDownTime) {
+                    // Entity is no longer slowed down, remove amplifier
+                    effect.target.setSpeedAmplifier(identitySpeedAmplifier, 1.0)
+                } else if(effectTicks > slowDownTime) {
+                    // Entity is in coolDown phase
+                    if(effectTicks >= slowDownTime + coolDownTime) iterator.remove()
+                } else {
+                    // Entity is slowed down
+                    // A new speedAmplifier will be evaluated and applied
+                    effect.target.setSpeedAmplifier(identitySpeedAmplifier, min(max(slowDownFunction(effect.slowDownTicks.toDouble() / slowDownTime), 0.0), 1.0))
+                }
             }
         }
 
     }
 
-    // Inner class to keep track of the slowDown Effect
-    inner class SlowDownEffect {
+    // Wrapper class to keep track of the slowDown Effect
+    class SlowDownEffect(val target: MovingEntity) {
+
         var slowDownTicks = 0L
-        val owner
-            get() = this@SlowDownTile
+
+        // This class takes the identity of ::target, in order to be matched by the HashSet
+        override fun equals(other: Any?): Boolean {
+            if (this === other) return true //Should never happen
+            if (other !is SlowDownEffect || target !== other.target) return false
+            return true
+        }
+
+        // This class takes the identity of ::target, in order to be matched by the HashSet
+        override fun hashCode() = System.identityHashCode(target)
+
     }
 
 }

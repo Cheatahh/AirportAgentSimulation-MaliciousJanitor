@@ -1,12 +1,13 @@
 package cheatahh.se.agent
 
-import cheatahh.se.util.unsafe
 import cheatahh.se.util.AgentCompanion
-import cheatahh.se.util.xFractionOffset
-import cheatahh.se.util.yFractionOffset
+import cheatahh.se.util.solidOffset
+import cheatahh.se.util.runInjected
+import cheatahh.se.util.unsafe
 import dhbw.sose2022.softwareengineering.airportagentsim.simulation.api.config.ConfigurableAttribute
 import dhbw.sose2022.softwareengineering.airportagentsim.simulation.api.geometry.Point
 import dhbw.sose2022.softwareengineering.airportagentsim.simulation.api.simulation.entity.Agent
+import dhbw.sose2022.softwareengineering.airportagentsim.simulation.simulation.SimulationWorld
 import kotlin.math.max
 import kotlin.math.min
 import kotlin.random.Random
@@ -40,22 +41,22 @@ class MaliciousJanitor(initialSpeed: Double, tilePlacingChance: String, private 
     } catch (_: Exception) { null } } + MaliciousJanitor::class.java
 
     // The last position of this agent. Used to determine, whether the agent is stuck
-    private var lastXFraction = 0.0
-    private var lastYFraction = 0.0
+    private var lastPosition = Point(-1, -1)
 
     init {
         speed = initialSpeed
     }
 
+    override fun onBirth() {
+        // Ensure the underlying world is of the expected type -> Unsafe Api, temporary workaround
+        require(world is SimulationWorld)
+    }
+
     // Move and place SlowDownTiles
     override fun pluginUpdate() {
 
-        // Get the current position as exact doubles
-        val xFraction = unsafe.getDouble(this, xFractionOffset)
-        val yFraction = unsafe.getDouble(this, yFractionOffset)
-
-        if(lastXFraction == xFraction && lastYFraction == yFraction) {
-            // We have not moved since the last tick -> We are stuck
+        // Move
+        if(lastPosition == position) {
             do {
                 try {
                     // Try to turn to a random point
@@ -64,17 +65,17 @@ class MaliciousJanitor(initialSpeed: Double, tilePlacingChance: String, private 
                 } catch (_: Exception) {} // Rare condition, where the randomly generated point is the exact point we are currently standing on.
             } while(true)
         }
-
-        lastXFraction = xFraction
-        lastYFraction = yFraction
+        lastPosition = position
 
         // Place a SlowDownTile
         if(Random.nextDouble() <= placingChance) {
-            // Check whether this point already contains a SlowDownTile, if not, spawn a new one
-            if(world.entities.none { it.position == position && it is SlowDownTile }) {
+            val tilePosition = position
+            if(tilePosition.x < world.width - 1 && tilePosition.y < world.height - 1) {
                 val tile = SlowDownTile(tileLifeTime, tileSlowDownTime, tileSlowDownCoolDown, slowDownFunction, excludedTypes)
-                val pos = position
-                tile.spawn(world, pos.x, pos.y, width, height)
+                unsafe.putBoolean(tile, solidOffset, false)
+                world.runInjected(tile) {
+                    tile.spawn(world, tilePosition.x, tilePosition.y, 1, 1)
+                }
             }
         }
 

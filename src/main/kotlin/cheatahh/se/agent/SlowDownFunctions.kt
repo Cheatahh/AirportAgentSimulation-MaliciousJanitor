@@ -14,7 +14,7 @@ import kotlin.math.pow
  * */
 internal typealias SlowDownFunction = (time: Double) -> Double
 
-object SlowDownFunctions {
+internal object SlowDownFunctions {
 
     /**
      * Constant holding an exponential progress function.

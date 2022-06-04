@@ -5,7 +5,7 @@ plugins {
 }
 
 group = "cheatahh.jvm"
-version = "0.1"
+version = "0.3"
 
 // Repository Lookups
 repositories {
@@ -14,7 +14,11 @@ repositories {
 
 // Used Dependencies
 dependencies {
-    compileOnly(files("lib/airportAgentSim.jar")) // Precompiled jar, do not export
+    val airportAgentSim = files("lib/airportAgentSim.zip")
+
+    compileOnly(airportAgentSim) // Precompiled jar, do not export
+
+    testImplementation(airportAgentSim)
     testImplementation(kotlin("test")) // JUnit 5.8.2
 }
 
@@ -24,7 +28,7 @@ tasks.compileKotlin {
         jvmTarget = "1.8"
         languageVersion = "1.6"
     }
-    kotlinOptions.freeCompilerArgs += "-Xlambdas=indy"
+    kotlinOptions.freeCompilerArgs += arrayOf("-Xlambdas=indy")
 }
 
 // Test Setup

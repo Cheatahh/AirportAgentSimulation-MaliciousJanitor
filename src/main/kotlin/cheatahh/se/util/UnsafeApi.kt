@@ -2,17 +2,15 @@
 
 package cheatahh.se.util
 
-import dhbw.sose2022.softwareengineering.airportagentsim.simulation.api.simulation.entity.MovingEntity
+import dhbw.sose2022.softwareengineering.airportagentsim.simulation.api.simulation.entity.Entity
+import dhbw.sose2022.softwareengineering.airportagentsim.simulation.simulation.SimulationWorld
 import sun.misc.Unsafe
 
 // Provides access to the Unsafe API
 internal val unsafe = Unsafe::class.java.getDeclaredField("theUnsafe").also { it.isAccessible = true }[null] as Unsafe
 
-// Field offset of MovingEntity::speedAmplifier
-internal val speedAmplifierOffset = unsafe.objectFieldOffset(MovingEntity::class.java.getDeclaredField("speedAmplifier"))
+// Field offset of Entity::isSolid
+internal val solidOffset = unsafe.objectFieldOffset(Entity::class.java.getDeclaredField("solid"))
 
-// Field offset of MovingEntity::xFraction
-internal val xFractionOffset = unsafe.objectFieldOffset(MovingEntity::class.java.getDeclaredField("xFraction"))
-
-// Field offset of MovingEntity::yFraction
-internal val yFractionOffset = unsafe.objectFieldOffset(MovingEntity::class.java.getDeclaredField("yFraction"))
+// Field offset of SimulationWorld::messages
+internal val messagesOffset = unsafe.objectFieldOffset(SimulationWorld::class.java.getDeclaredField("messages"))
