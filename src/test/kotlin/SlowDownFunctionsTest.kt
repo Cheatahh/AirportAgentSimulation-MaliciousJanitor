@@ -4,9 +4,9 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 
-const val maxTick = 1000u
+private const val maxTick = 1000u
 
-internal class SlowDownFunctionsTest {
+class SlowDownFunctionsTest {
 
     @Test
     fun testLinearFunction() {
