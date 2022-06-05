@@ -1,5 +1,6 @@
 package cheatahh.se.agent
 
+import cheatahh.se.util.ContextLogger
 import cheatahh.se.util.runInjected
 import dhbw.sose2022.softwareengineering.airportagentsim.simulation.api.simulation.entity.MovingEntity
 import dhbw.sose2022.softwareengineering.airportagentsim.simulation.api.simulation.entity.StaticEntity
@@ -9,6 +10,7 @@ import kotlin.math.min
 /**
  * The [SlowDownTile] Entity, described in [MaliciousJanitor]
  * */
+context(ContextLogger)
 internal class SlowDownTile(private val lifeTime: Long, private val slowDownTime: Long, private val coolDownTime: Long, private val slowDownFunction: SlowDownFunction, private val excludedTypes: List<Class<*>>) : StaticEntity() {
 
     // The ticks since this tile is alive. If this value is larger than [lifeTime] the tile will kill itself
@@ -22,6 +24,11 @@ internal class SlowDownTile(private val lifeTime: Long, private val slowDownTime
 
     override fun onBirth() {
         isSolid = false // This entity is non-solid. It will not take part in collision detections to allow entities to enter the tile
+        info("Placed a new SlowDownTile at (${position.x}, $position.y)")
+    }
+
+    override fun onDeath() {
+        info("SlowDownTile at (${position.x}, $position.y) died")
     }
 
     override fun pluginUpdate() {
@@ -55,7 +62,10 @@ internal class SlowDownTile(private val lifeTime: Long, private val slowDownTime
                 } else {
                     // Entity is slowed down
                     // A new speedAmplifier will be evaluated and applied
-                    effect.target.setSpeedAmplifier(identitySpeedAmplifier, min(max(slowDownFunction(effect.slowDownTicks.toDouble() / slowDownTime), 0.0), 1.0))
+                    val newAmplifier = min(max(slowDownFunction(effect.slowDownTicks.toDouble() / slowDownTime), 0.0), 1.0)
+                    val currentSpeed = effect.target.amplifiedSpeed
+                    effect.target.setSpeedAmplifier(identitySpeedAmplifier, newAmplifier)
+                    info("Changed speed of ${effect.target} ($currentSpeed -> ${effect.target.amplifiedSpeed})")
                 }
             }
         }

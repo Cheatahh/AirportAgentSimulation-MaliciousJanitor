@@ -1,8 +1,8 @@
 package cheatahh.se.agent
 
+import cheatahh.se.util.*
 import cheatahh.se.util.AgentCompanion
 import cheatahh.se.util.solidOffset
-import cheatahh.se.util.runInjected
 import cheatahh.se.util.unsafe
 import dhbw.sose2022.softwareengineering.airportagentsim.simulation.api.config.ConfigurableAttribute
 import dhbw.sose2022.softwareengineering.airportagentsim.simulation.api.geometry.Point
@@ -27,13 +27,16 @@ import kotlin.random.Random
  * @param excludedEntityTypes A list of entity types to be excluded by the SlowDownTiles, delimited by whitespaces and commas.
  *
  * */
-class MaliciousJanitor(initialSpeed: Double, tilePlacingChance: String, private val tileLifeTime: Long, private val tileSlowDownTime: Long, private val tileSlowDownCoolDown: Long, tileSlowDownFunction: String, excludedEntityTypes: String) : Agent() {
+class MaliciousJanitor(initialSpeed: DoubleValue, tilePlacingChance: String, private val tileLifeTime: LongValue, private val tileSlowDownTime: LongValue, private val tileSlowDownCoolDown: LongValue, tileSlowDownFunction: String, excludedEntityTypes: String) : Agent() {
+
+    // Null-Safe logger
+    private val logger = ContextLogger(plugin)
 
     // The actual chance to place down a SlowDownTime, Ranges from 0.0 - 1.0
     private val placingChance = min(max(tilePlacingChance.substringBefore('%').toDoubleOrNull() ?: 10.0, 0.0), 100.0) / 100.0
 
     // The parsed SlowDownFunction, cached for faster invocation
-    private val slowDownFunction = SlowDownFunctions[tileSlowDownFunction]
+    private val slowDownFunction = with(logger) { SlowDownFunctions[tileSlowDownFunction] }
 
     // A list of excluded class types, cached for faster invocation
     private val excludedTypes = excludedEntityTypes.split(Regex("[\\s,]+")).mapNotNull { try {
@@ -44,12 +47,14 @@ class MaliciousJanitor(initialSpeed: Double, tilePlacingChance: String, private 
     private var lastPosition = Point(-1, -1)
 
     init {
-        speed = initialSpeed
+        speed = initialSpeed.toDouble()
     }
 
     override fun onBirth() {
         // Ensure the underlying world is of the expected type -> Unsafe Api, temporary workaround
         require(world is SimulationWorld)
+
+        logger.info("Hello World!")
     }
 
     // Move and place SlowDownTiles
@@ -71,7 +76,9 @@ class MaliciousJanitor(initialSpeed: Double, tilePlacingChance: String, private 
         if(Random.nextDouble() <= placingChance) {
             val tilePosition = position
             if(tilePosition.x < world.width - 1 && tilePosition.y < world.height - 1) {
-                val tile = SlowDownTile(tileLifeTime, tileSlowDownTime, tileSlowDownCoolDown, slowDownFunction, excludedTypes)
+                val tile = with(logger) {
+                    SlowDownTile(tileLifeTime.toLong(), tileSlowDownTime.toLong(), tileSlowDownCoolDown.toLong(), slowDownFunction, excludedTypes)
+                }
                 unsafe.putBoolean(tile, solidOffset, false)
                 world.runInjected(tile) {
                     tile.spawn(world, tilePosition.x, tilePosition.y, 1, 1)
@@ -92,11 +99,11 @@ class MaliciousJanitor(initialSpeed: Double, tilePlacingChance: String, private 
 
         override val arguments: Array<ConfigurableAttribute>
             get() = arrayOf(
-                ConfigurableAttribute("initialSpeed", Double::class.java, 1.0),
+                ConfigurableAttribute("initialSpeed", DoubleValue::class.java, 1.0 as DoubleValue),
                 ConfigurableAttribute("tilePlacingChance", String::class.java, "10%"),
-                ConfigurableAttribute("tileLifeTime", Long::class.java, 100),
-                ConfigurableAttribute("tileSlowDownTime", Long::class.java, 50),
-                ConfigurableAttribute("tileSlowDownCoolDown", Long::class.java, 20),
+                ConfigurableAttribute("tileLifeTime", LongValue::class.java, 100L as LongValue),
+                ConfigurableAttribute("tileSlowDownTime", LongValue::class.java, 50L as LongValue),
+                ConfigurableAttribute("tileSlowDownCoolDown", LongValue::class.java, 20L as LongValue),
                 ConfigurableAttribute("tileSlowDownFunction", String::class.java, "linear"),
                 ConfigurableAttribute("excludedEntityTypes", String::class.java, "")
             )

@@ -1,3 +1,5 @@
+@file:Suppress("PLATFORM_CLASS_MAPPED_TO_KOTLIN")
+
 package cheatahh.se.util
 
 import dhbw.sose2022.softwareengineering.airportagentsim.simulation.api.AirportAgentSimulation
@@ -19,3 +21,6 @@ internal inline fun <reified AgentType : Agent> Plugin.registerAgent(agentDescri
     }
 
 }
+
+internal typealias DoubleValue = java.lang.Double
+internal typealias LongValue = java.lang.Long

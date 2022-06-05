@@ -2,6 +2,7 @@
 
 package cheatahh.se.agent
 
+import cheatahh.se.util.ContextLogger
 import kotlin.math.max
 import kotlin.math.min
 import kotlin.math.pow
@@ -63,7 +64,10 @@ internal object SlowDownFunctions {
      *
      * @param name The name of the function. Possible values are "exponential", "exponentialInverted", "linear", "cubic", "cubicInverted" or any percentages like for example "42%".
      * */
-    operator fun get(name: String): SlowDownFunction = getOrNull(name) ?: { 0.0 }
+    context(ContextLogger)
+    operator fun get(name: String): SlowDownFunction = getOrNull(name) ?: { _: Double -> 0.0 }.also {
+        warn("Could not parse name '$name', using 0% instead")
+    }
 
     internal fun getOrNull(name: String): SlowDownFunction? {
         return when(name) {
