@@ -1,0 +1,13 @@
+{
+  "seed": 1337,
+  "width": 42,
+  "height": 42,
+  "placedEntities": [{
+    "type": "MaliciousJanitor",
+    "position": [0, 0],
+    "width": 1,
+    "height": 1,
+    "generates": [],
+    "pluginAttributes": {}
+  }]
+}

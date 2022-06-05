@@ -53,7 +53,6 @@ class MaliciousJanitor(initialSpeed: DoubleValue, tilePlacingChance: String, pri
     override fun onBirth() {
         // Ensure the underlying world is of the expected type -> Unsafe Api, temporary workaround
         require(world is SimulationWorld)
-
         logger.info("Hello World!")
     }
 
