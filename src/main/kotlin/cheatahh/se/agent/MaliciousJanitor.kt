@@ -1,5 +1,6 @@
 package cheatahh.se.agent
 
+import cheatahh.se.integration.newDoorHandler
 import cheatahh.se.util.*
 import cheatahh.se.util.EntityCompanion
 import cheatahh.se.util.solidOffset
@@ -46,6 +47,9 @@ class MaliciousJanitor(initialSpeed: DoubleValue, tilePlacingChance: String, pri
     // The last position of this agent. Used to determine, whether the agent is stuck
     private var lastPosition = Point(-1, -1)
 
+    // Auto open & closed doors, as this is a staff member
+    private val doorHandler = newDoorHandler()
+
     init {
         speed = initialSpeed.toDouble()
     }
@@ -59,8 +63,13 @@ class MaliciousJanitor(initialSpeed: DoubleValue, tilePlacingChance: String, pri
     // Move and place SlowDownTiles
     override fun pluginUpdate() {
 
+        val currentPosition = position
+
+        // Open & close doors
+        doorHandler(logger, world.entities, currentPosition, amplifiedSpeed)
+
         // Move
-        if(lastPosition == position) {
+        if(lastPosition == currentPosition) {
             do {
                 try {
                     // Try to turn to a random point
@@ -69,16 +78,15 @@ class MaliciousJanitor(initialSpeed: DoubleValue, tilePlacingChance: String, pri
                 } catch (_: Exception) {} // Rare condition, where the randomly generated point is the exact point we are currently standing on.
             } while(true)
         }
-        lastPosition = position
+        lastPosition = currentPosition
 
         // Place a SlowDownTile
         if(Random.nextDouble() <= placingChance) {
-            val tilePosition = position
-            if(tilePosition.x < world.width - 1 && tilePosition.y < world.height - 1) {
+            if(currentPosition.x < world.width - 1 && currentPosition.y < world.height - 1) {
                 val tile = SlowDownTile(logger, tileLifeTime.toLong(), tileSlowDownTime.toLong(), tileSlowDownCoolDown.toLong(), slowDownFunction, excludedTypes)
                 unsafe.putBoolean(tile, solidOffset, false)
                 world.runInjected(tile) {
-                    tile.spawn(world, tilePosition.x, tilePosition.y, 1, 1)
+                    tile.spawn(world, currentPosition.x, currentPosition.y, 1, 1)
                 }
             }
         }

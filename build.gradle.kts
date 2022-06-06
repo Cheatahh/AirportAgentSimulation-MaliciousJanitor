@@ -5,7 +5,8 @@ plugins {
 }
 
 group = "cheatahh.jvm"
-version = "1.0"
+version = "1.1"
+val production = true
 
 // Repository Lookups
 repositories {
@@ -14,11 +15,21 @@ repositories {
 
 // Used Dependencies
 dependencies {
-    val airportAgentSim = files("lib/airportAgentSim.zip")
+    val libraryRoot = "lib"
 
-    compileOnly(airportAgentSim) // Precompiled jar, do not export
+    val airportAgentSim = files("$libraryRoot/airportAgentSim.zip")
+    val airportAgentSimObjectsIntegration = files("$libraryRoot/airportAgentSimObjectsIntegration.zip")
+
+    if(production) {
+        compileOnly(airportAgentSim) // Precompiled jar, do not export
+        compileOnly(airportAgentSimObjectsIntegration) // Precompiled jar, do not export
+    } else {
+        implementation(airportAgentSim) // Precompiled jar, do not export
+        implementation(airportAgentSimObjectsIntegration) // Precompiled jar, do not export
+    }
 
     testImplementation(airportAgentSim)
+    testImplementation(airportAgentSimObjectsIntegration)
     testImplementation(kotlin("test"))
 }
 

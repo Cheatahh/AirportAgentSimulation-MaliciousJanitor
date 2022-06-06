@@ -4,7 +4,7 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 
-private const val maxTick = 1000u
+private const val maxTick = 1000
 
 class SlowDownFunctionsTest {
 
@@ -13,7 +13,7 @@ class SlowDownFunctionsTest {
         val function = SlowDownFunctions.getOrNull("linear")
         assertNotNull(function, "Could not parse input 'linear'")
 
-        for(tick in 0u..maxTick) {
+        repeat(maxTick) { tick ->
             val tickProgress = tick.toDouble() / maxTick.toDouble()
             val slowDownFactor = function(tickProgress)
             assertEquals(tickProgress, slowDownFactor)
@@ -25,7 +25,7 @@ class SlowDownFunctionsTest {
         val function = SlowDownFunctions.getOrNull("cubic")
         assertNotNull(function, "Could not parse input 'cubic'")
 
-        for(tick in 0u..maxTick) {
+        repeat(maxTick) { tick ->
             val tickProgress = tick.toDouble() / maxTick.toDouble()
             val slowDownFactor = function(tickProgress)
             assertEquals(tickProgress * tickProgress, slowDownFactor)
@@ -37,7 +37,7 @@ class SlowDownFunctionsTest {
         val function = SlowDownFunctions.getOrNull("cubicInverted")
         assertNotNull(function, "Could not parse input 'cubicInverted'")
 
-        for(tick in 0u..maxTick) {
+        repeat(maxTick) { tick ->
             val tickProgress = tick.toDouble() / maxTick.toDouble()
             val slowDownFactor = function(tickProgress)
             val oneMinusTickProgress = 1.0 - tickProgress
@@ -50,7 +50,7 @@ class SlowDownFunctionsTest {
         val function = SlowDownFunctions.getOrNull("exponential")
         assertNotNull(function, "Could not parse input 'exponential'")
 
-        for(tick in 0u..maxTick) {
+        repeat(maxTick) { tick ->
             val tickProgress = tick.toDouble() / maxTick.toDouble()
             val slowDownFactor = function(tickProgress)
 
@@ -64,7 +64,7 @@ class SlowDownFunctionsTest {
         val function = SlowDownFunctions.getOrNull("exponentialInverted")
         assertNotNull(function, "Could not parse input 'exponentialInverted'")
 
-        for(tick in 0u..maxTick) {
+        repeat(maxTick) { tick ->
             val tickProgress = tick.toDouble() / maxTick.toDouble()
             val slowDownFactor = function(tickProgress)
 
@@ -80,7 +80,7 @@ class SlowDownFunctionsTest {
         val function = SlowDownFunctions.getOrNull("${percentage * 100}")
         assertNotNull(function, "Could not parse input '$percentage'")
 
-        for(tick in 0u..maxTick) {
+        repeat(maxTick) { tick ->
             val tickProgress = tick.toDouble() / maxTick.toDouble()
             val slowDownFactor = function(tickProgress)
             assertEquals(slowDownFactor, percentage)
@@ -94,7 +94,7 @@ class SlowDownFunctionsTest {
         val function = SlowDownFunctions.getOrNull("${percentage * 100}%")
         assertNotNull(function, "Could not parse input '$percentage'")
 
-        for(tick in 0u..maxTick) {
+        repeat(maxTick) { tick ->
             val tickProgress = tick.toDouble() / maxTick.toDouble()
             val slowDownFactor = function(tickProgress)
             assertEquals(slowDownFactor, percentage)

@@ -19,28 +19,28 @@ private const val effectTime = 10000L
 private const val slowDownFunction = "10%"
 private const val excludedClassTypes = ""
 
-private const val maxTick = 100000u
+private const val maxTick = 100000
 
 class MaliciousJanitorTest {
-
-    private val localWorld = SimulationWorld(null, null, worldSize, worldSize)
 
     /**
      * Tests the walking pattern of a MaliciousJanitor
      * */
     @Test
     fun testWalking() {
+        val localWorld = SimulationWorld(null, null, worldSize, worldSize)
+
         val janitor = MaliciousJanitor(speed as DoubleValue, placingChance, 1L as LongValue, effectTime as LongValue, effectTime, slowDownFunction, excludedClassTypes)
         janitor.spawn(localWorld, 0, 0, 1, 1)
 
         var previousPosition = Point(0, 0)
         val image = BufferedImage(worldSize, worldSize, BufferedImage.TYPE_INT_RGB)
 
-        image.createGraphics().also {
-            it.color = Color.RED
-            for(tick in 0u ..maxTick) {
+        image.createGraphics().also { graphics ->
+            graphics.color = Color.RED
+            repeat(maxTick) {
                 localWorld.update()
-                it.drawLine(previousPosition.x, previousPosition.y, janitor.position.x, janitor.position.y)
+                graphics.drawLine(previousPosition.x, previousPosition.y, janitor.position.x, janitor.position.y)
                 previousPosition = janitor.position
             }
         }
@@ -53,6 +53,8 @@ class MaliciousJanitorTest {
      * */
     @Test
     fun testPlacing() {
+        val localWorld = SimulationWorld(null, null, worldSize, worldSize)
+
         val janitor = MaliciousJanitor(speed as DoubleValue, placingChance, 1L as LongValue, effectTime as LongValue, effectTime, slowDownFunction, excludedClassTypes)
         janitor.spawn(localWorld, 0, 0, 1, 1)
 
@@ -60,7 +62,7 @@ class MaliciousJanitorTest {
 
         image.createGraphics().also { graphics ->
             graphics.color = Color.RED
-            for(tick in 0u ..maxTick) {
+            repeat(maxTick) {
                 localWorld.update()
                 localWorld.entities.forEach {
                     if(it is SlowDownTile) {
@@ -78,6 +80,8 @@ class MaliciousJanitorTest {
      * */
     @Test
     fun testWithCivilian() {
+        val localWorld = SimulationWorld(null, null, worldSize, worldSize)
+
         val janitor = MaliciousJanitor(speed as DoubleValue, placingChance, effectTime as LongValue, effectTime, effectTime, slowDownFunction, excludedClassTypes)
         janitor.spawn(localWorld, 0, 0, 1, 1)
         val civilian = TestCivilian(speed)
@@ -91,19 +95,19 @@ class MaliciousJanitorTest {
 
         val tiles = hashSetOf<SlowDownTile>()
 
-        image.createGraphics().also {
-            for(tick in 0u ..100000u) {
+        image.createGraphics().also { graphics ->
+            repeat(maxTick) {
                 localWorld.update()
 
                 localWorld.entities.forEach { entity ->
                     if(entity is SlowDownTile) tiles += entity
                 }
 
-                it.color = Color.RED
-                it.drawLine(previousJanitorPosition.x, previousJanitorPosition.y, janitor.position.x, janitor.position.y)
+                graphics.color = Color.RED
+                graphics.drawLine(previousJanitorPosition.x, previousJanitorPosition.y, janitor.position.x, janitor.position.y)
 
-                it.color = if(civilian.speedAmplifier != 1.0) Color.GREEN else Color.BLUE
-                it.drawLine(previousCivilianPosition.x, previousCivilianPosition.y, civilian.position.x, civilian.position.y)
+                graphics.color = if(civilian.speedAmplifier != 1.0) Color.GREEN else Color.BLUE
+                graphics.drawLine(previousCivilianPosition.x, previousCivilianPosition.y, civilian.position.x, civilian.position.y)
 
                 distanceTraveledJanitor += previousJanitorPosition.getDistance(janitor.position)
                 previousJanitorPosition = janitor.position
@@ -112,16 +116,16 @@ class MaliciousJanitorTest {
                 previousCivilianPosition = civilian.position
             }
 
-            it.color = Color(0, 0, 0, 100)
-            it.fillRect(0, 0, worldSize, 70)
+            graphics.color = Color(0, 0, 0, 100)
+            graphics.fillRect(0, 0, worldSize, 70)
 
-            it.color = Color.WHITE
-            it.drawString("Distance traveled (Janitor): ${distanceTraveledJanitor.toLong()}", 0, 10)
-            it.drawString("Distance traveled (Civilian): ${distanceTraveledCivilian.toLong()}", 0, 22)
-            it.drawString("Tiles placed: ${tiles.size} (Chance: ${((tiles.size / maxTick.toFloat()) * 100)}%)", 0, 34)
-            it.drawString("Janitor: Red", 0, 46)
-            it.drawString("Civilian: Blue", 0, 58)
-            it.drawString("Civilian slowed down: Green", 0, 70)
+            graphics.color = Color.WHITE
+            graphics.drawString("Distance traveled (Janitor): ${distanceTraveledJanitor.toLong()}", 0, 10)
+            graphics.drawString("Distance traveled (Civilian): ${distanceTraveledCivilian.toLong()}", 0, 22)
+            graphics.drawString("Tiles placed: ${tiles.size} (Chance: ${((tiles.size / maxTick.toFloat()) * 100)}%)", 0, 34)
+            graphics.drawString("Janitor: Red", 0, 46)
+            graphics.drawString("Civilian: Blue", 0, 58)
+            graphics.drawString("Civilian slowed down: Green", 0, 70)
         }
 
         ImageIO.write(image, "png", File(File("${File("").absolutePath}/out/tests").also { it.mkdirs() }, "pathWithCivilian.png"))
