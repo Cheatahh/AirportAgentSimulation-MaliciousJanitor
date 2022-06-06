@@ -35,7 +35,7 @@ internal class SlowDownTile(private val logger: ContextLogger, private val lifeT
     }
 
     override fun onDeath() {
-        logger.info("SlowDownTile at (${position.x}, $position.y) died")
+        logger.info("SlowDownTile at (${position.x}, ${position}.y) died")
     }
 
     override fun pluginUpdate() {
