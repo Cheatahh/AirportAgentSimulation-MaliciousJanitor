@@ -5,17 +5,17 @@ package cheatahh.se.util
 import dhbw.sose2022.softwareengineering.airportagentsim.simulation.api.AirportAgentSimulation
 import dhbw.sose2022.softwareengineering.airportagentsim.simulation.api.config.ConfigurationFormatException
 import dhbw.sose2022.softwareengineering.airportagentsim.simulation.api.plugin.Plugin
-import dhbw.sose2022.softwareengineering.airportagentsim.simulation.api.simulation.entity.Agent
+import dhbw.sose2022.softwareengineering.airportagentsim.simulation.api.simulation.entity.Entity
 
 /**
- * Helper function to register an agent.
+ * Helper function to register an entity.
  *
- * @param agentDescriptor The Companion Descriptor of the agent class
+ * @param entityDescriptor The Companion Descriptor of the entity class
  * */
-internal inline fun <reified AgentType : Agent> Plugin.registerAgent(agentDescriptor: AgentCompanion<AgentType>) {
+internal inline fun <reified EntityType : Entity> Plugin.registerEntity(entityDescriptor: EntityCompanion<EntityType>) {
 
     try {
-        AirportAgentSimulation.registerEntity(this, agentDescriptor.id, AgentType::class.java, agentDescriptor.arguments)
+        AirportAgentSimulation.registerEntity(this, entityDescriptor.id, EntityType::class.java, entityDescriptor.arguments)
     } catch (exception: ConfigurationFormatException) {
         exception.printStackTrace()
     }

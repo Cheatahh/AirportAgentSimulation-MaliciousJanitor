@@ -1,7 +1,7 @@
 package cheatahh.se.agent
 
 import cheatahh.se.util.*
-import cheatahh.se.util.AgentCompanion
+import cheatahh.se.util.EntityCompanion
 import cheatahh.se.util.solidOffset
 import cheatahh.se.util.unsafe
 import dhbw.sose2022.softwareengineering.airportagentsim.simulation.api.config.ConfigurableAttribute
@@ -75,9 +75,7 @@ class MaliciousJanitor(initialSpeed: DoubleValue, tilePlacingChance: String, pri
         if(Random.nextDouble() <= placingChance) {
             val tilePosition = position
             if(tilePosition.x < world.width - 1 && tilePosition.y < world.height - 1) {
-                val tile = with(logger) {
-                    SlowDownTile(tileLifeTime.toLong(), tileSlowDownTime.toLong(), tileSlowDownCoolDown.toLong(), slowDownFunction, excludedTypes)
-                }
+                val tile = SlowDownTile(logger, tileLifeTime.toLong(), tileSlowDownTime.toLong(), tileSlowDownCoolDown.toLong(), slowDownFunction, excludedTypes)
                 unsafe.putBoolean(tile, solidOffset, false)
                 world.runInjected(tile) {
                     tile.spawn(world, tilePosition.x, tilePosition.y, 1, 1)
@@ -91,7 +89,7 @@ class MaliciousJanitor(initialSpeed: DoubleValue, tilePlacingChance: String, pri
      * Companion Object to class [MaliciousJanitor].
      * Serves as descriptor for registering this agent.
      * */
-    companion object : AgentCompanion<MaliciousJanitor> {
+    companion object : EntityCompanion<MaliciousJanitor> {
 
         override val id: String
             get() = "MaliciousJanitor"

@@ -1,7 +1,8 @@
 package cheatahh.se
 
 import cheatahh.se.agent.MaliciousJanitor
-import cheatahh.se.util.registerAgent
+import cheatahh.se.agent.SlowDownTile
+import cheatahh.se.util.registerEntity
 import dhbw.sose2022.softwareengineering.airportagentsim.simulation.api.AirportAgentSimulation
 import dhbw.sose2022.softwareengineering.airportagentsim.simulation.api.plugin.Plugin
 
@@ -13,7 +14,8 @@ import dhbw.sose2022.softwareengineering.airportagentsim.simulation.api.plugin.P
 class MaliciousJanitorPlugin : Plugin {
 
     override fun activate() {
-        registerAgent(MaliciousJanitor)
+        registerEntity(MaliciousJanitor)
+        registerEntity(SlowDownTile)
     }
 
 }

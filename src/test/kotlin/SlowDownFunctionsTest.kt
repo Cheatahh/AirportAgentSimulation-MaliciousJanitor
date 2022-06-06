@@ -1,4 +1,4 @@
-import cheatahh.se.agent.SlowDownFunctions
+import cheatahh.se.util.SlowDownFunctions
 import kotlin.math.pow
 import kotlin.test.Test
 import kotlin.test.assertEquals

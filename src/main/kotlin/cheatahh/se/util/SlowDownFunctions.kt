@@ -1,8 +1,7 @@
 @file:Suppress("SpellCheckingInspection", "KDocUnresolvedReference")
 
-package cheatahh.se.agent
+package cheatahh.se.util
 
-import cheatahh.se.util.ContextLogger
 import kotlin.math.max
 import kotlin.math.min
 import kotlin.math.pow
