@@ -11,6 +11,8 @@ If an entity walks over a SlowDownTile it receives a temporary slowdown.
 - **initialSpeed: Double** - The initial speed of this agent.
 - **tilePlacingChance: String** - Chance to lay down a SlowDownTile in percent. Example values are "69" or "42%".
 - **tileLifeTime: Long** - Total amount of ticks a SlowDownTile is considered alive. After this threshold is reached, the tile will get cleared.
+- **tileWidth: Int** - The width a SlowDownTile.
+- **tileHeight: Int** - The height a SlowDownTile.
 - **tileSlowDownTime: Long** - Total amount of ticks a SlowDownTile can affect an entity.
 - **tileSlowDownCoolDown: Long** - Total amount of ticks an entity cannot be affected by the same SlowDownTile, after it has been slowed down.
 - **tileSlowDownFunction: String** Function to determine the actual speed amplifier at a given point in time. Possible values are "exponential", "exponentialInverted", "linear", "cubic", "cubicInverted" or any percentages like for example "42%".

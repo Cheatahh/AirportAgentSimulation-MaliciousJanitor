@@ -1,6 +1,7 @@
 import cheatahh.se.agent.MaliciousJanitor
 import cheatahh.se.agent.SlowDownTile
 import cheatahh.se.util.DoubleValue
+import cheatahh.se.util.IntValue
 import cheatahh.se.util.LongValue
 import dhbw.sose2022.softwareengineering.airportagentsim.simulation.api.geometry.Point
 import dhbw.sose2022.softwareengineering.airportagentsim.simulation.api.simulation.entity.MovingEntity
@@ -15,6 +16,8 @@ import kotlin.test.Test
 private const val worldSize = 1024
 private const val speed = 1.0
 private const val placingChance = "1%"
+private const val tileLifeTime = 1L
+private const val size = 1
 private const val effectTime = 10000L
 private const val slowDownFunction = "10%"
 private const val excludedClassTypes = ""
@@ -30,8 +33,8 @@ class MaliciousJanitorTest {
     fun testWalking() {
         val localWorld = SimulationWorld(null, null, worldSize, worldSize)
 
-        val janitor = MaliciousJanitor(speed as DoubleValue, placingChance, 1L as LongValue, effectTime as LongValue, effectTime, slowDownFunction, excludedClassTypes)
-        janitor.spawn(localWorld, 0, 0, 1, 1)
+        val janitor = MaliciousJanitor(speed as DoubleValue, placingChance, tileLifeTime as LongValue, size as IntValue, size, effectTime as LongValue, effectTime, slowDownFunction, excludedClassTypes)
+        janitor.spawn(localWorld, 0, 0, size, size)
 
         var previousPosition = Point(0, 0)
         val image = BufferedImage(worldSize, worldSize, BufferedImage.TYPE_INT_RGB)
@@ -55,8 +58,8 @@ class MaliciousJanitorTest {
     fun testPlacing() {
         val localWorld = SimulationWorld(null, null, worldSize, worldSize)
 
-        val janitor = MaliciousJanitor(speed as DoubleValue, placingChance, 1L as LongValue, effectTime as LongValue, effectTime, slowDownFunction, excludedClassTypes)
-        janitor.spawn(localWorld, 0, 0, 1, 1)
+        val janitor = MaliciousJanitor(speed as DoubleValue, placingChance, tileLifeTime as LongValue, size as IntValue, size, effectTime as LongValue, effectTime, slowDownFunction, excludedClassTypes)
+        janitor.spawn(localWorld, 0, 0, size, size)
 
         val image = BufferedImage(worldSize, worldSize, BufferedImage.TYPE_INT_RGB)
 
@@ -66,7 +69,7 @@ class MaliciousJanitorTest {
                 localWorld.update()
                 localWorld.entities.forEach {
                     if(it is SlowDownTile) {
-                        graphics.fillRect(it.position.x, it.position.y, 1, 1)
+                        graphics.fillRect(it.position.x, it.position.y, size, size)
                     }
                 }
             }
@@ -82,10 +85,10 @@ class MaliciousJanitorTest {
     fun testWithCivilian() {
         val localWorld = SimulationWorld(null, null, worldSize, worldSize)
 
-        val janitor = MaliciousJanitor(speed as DoubleValue, placingChance, effectTime as LongValue, effectTime, effectTime, slowDownFunction, excludedClassTypes)
-        janitor.spawn(localWorld, 0, 0, 1, 1)
+        val janitor = MaliciousJanitor(speed as DoubleValue, placingChance, effectTime as LongValue, size as IntValue, size, effectTime, effectTime, slowDownFunction, excludedClassTypes)
+        janitor.spawn(localWorld, 0, 0, size, size)
         val civilian = TestCivilian(speed)
-        civilian.spawn(localWorld, 1, 0, 1, 1)
+        civilian.spawn(localWorld, size, 0, size, size)
 
         var distanceTraveledJanitor = 0.0
         var previousJanitorPosition = Point(0, 0)

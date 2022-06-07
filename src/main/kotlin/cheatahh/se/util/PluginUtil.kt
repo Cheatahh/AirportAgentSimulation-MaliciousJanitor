@@ -24,3 +24,4 @@ internal inline fun <reified EntityType : Entity> Plugin.registerEntity(entityDe
 
 internal typealias DoubleValue = java.lang.Double
 internal typealias LongValue = java.lang.Long
+internal typealias IntValue = Integer

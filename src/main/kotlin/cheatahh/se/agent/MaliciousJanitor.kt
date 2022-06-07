@@ -22,13 +22,15 @@ import kotlin.random.Random
  * @param initialSpeed The initial speed of this agent.
  * @param tilePlacingChance Chance to lay down a SlowDownTile in percent. Example values are "69" or "42%".
  * @param tileLifeTime Total amount of ticks a SlowDownTile is considered alive. After this threshold is reached, the tile will get cleared.
+ * @param tileWidth The width a SlowDownTile.
+ * @param tileHeight The height a SlowDownTile.
  * @param tileSlowDownTime Total amount of ticks a SlowDownTile can affect an entity.
  * @param tileSlowDownCoolDown Total amount of ticks an entity cannot be affected by the same SlowDownTile, after it has been slowed down.
  * @param tileSlowDownFunction Function to determine the actual speed amplifier at a given point in time. Example values are "42%" or "linear".
  * @param excludedEntityTypes A list of entity types to be excluded by the SlowDownTiles, delimited by whitespaces and commas.
  *
  * */
-class MaliciousJanitor(initialSpeed: DoubleValue, tilePlacingChance: String, private val tileLifeTime: LongValue, private val tileSlowDownTime: LongValue, private val tileSlowDownCoolDown: LongValue, tileSlowDownFunction: String, excludedEntityTypes: String) : Agent() {
+class MaliciousJanitor(initialSpeed: DoubleValue, tilePlacingChance: String, private val tileLifeTime: LongValue, private val tileWidth: IntValue, private val tileHeight: IntValue, private val tileSlowDownTime: LongValue, private val tileSlowDownCoolDown: LongValue, tileSlowDownFunction: String, excludedEntityTypes: String) : Agent() {
 
     // Null-Safe logger
     private val logger = ContextLogger(plugin)
@@ -86,7 +88,7 @@ class MaliciousJanitor(initialSpeed: DoubleValue, tilePlacingChance: String, pri
                 val tile = SlowDownTile(logger, tileLifeTime.toLong(), tileSlowDownTime.toLong(), tileSlowDownCoolDown.toLong(), slowDownFunction, excludedTypes)
                 unsafe.putBoolean(tile, solidOffset, false)
                 world.runInjected(tile) {
-                    tile.spawn(world, currentPosition.x, currentPosition.y, 1, 1)
+                    tile.spawn(world, currentPosition.x, currentPosition.y, tileWidth.toInt(), tileHeight.toInt())
                 }
             }
         }
@@ -107,6 +109,8 @@ class MaliciousJanitor(initialSpeed: DoubleValue, tilePlacingChance: String, pri
                 ConfigurableAttribute("initialSpeed", DoubleValue::class.java, 1.0 as DoubleValue),
                 ConfigurableAttribute("tilePlacingChance", String::class.java, "10%"),
                 ConfigurableAttribute("tileLifeTime", LongValue::class.java, 100L as LongValue),
+                ConfigurableAttribute("tileWidth", IntValue::class.java, 1 as IntValue),
+                ConfigurableAttribute("tileHeight", IntValue::class.java, 1 as IntValue),
                 ConfigurableAttribute("tileSlowDownTime", LongValue::class.java, 50L as LongValue),
                 ConfigurableAttribute("tileSlowDownCoolDown", LongValue::class.java, 20L as LongValue),
                 ConfigurableAttribute("tileSlowDownFunction", String::class.java, "linear"),
