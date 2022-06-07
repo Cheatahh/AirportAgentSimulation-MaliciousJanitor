@@ -31,11 +31,11 @@ internal class SlowDownTile(private val logger: ContextLogger, private val lifeT
 
     override fun onBirth() {
         isSolid = false // This entity is non-solid. It will not take part in collision detections to allow entities to enter the tile
-        logger.info("Placed a new SlowDownTile at (${position.x}, $position.y)")
+        logger.info("Placed a new SlowDownTile at (${position.x}, ${position.y})")
     }
 
     override fun onDeath() {
-        logger.info("SlowDownTile at (${position.x}, ${position}.y) died")
+        logger.info("SlowDownTile at (${position.x}, ${position.y}) died")
     }
 
     override fun pluginUpdate() {
