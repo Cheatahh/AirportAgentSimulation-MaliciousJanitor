@@ -1,13 +1,21 @@
 {
   "seed": 1337,
-  "width": 42,
-  "height": 42,
+  "width": 1048576,
+  "height": 1048576,
   "placedEntities": [{
     "type": "MaliciousJanitor",
-    "position": [0, 0],
-    "width": 1,
-    "height": 1,
+    "position": [512, 512],
+    "width": 512,
+    "height": 512,
     "generates": [],
-    "pluginAttributes": {}
+    "pluginAttributes": {
+      "initialSpeed": 512,
+      "tilePlacingChance": "0.1%",
+      "tileWidth": 512,
+      "tileHeight": 512,
+      "tileSlowDownTime": 600,
+      "tileSlowDownCoolDown": 600,
+      "tileSlowDownFunction": "1%"
+    }
   }]
 }
