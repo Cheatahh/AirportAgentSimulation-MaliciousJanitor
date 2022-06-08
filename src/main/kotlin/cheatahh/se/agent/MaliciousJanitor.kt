@@ -2,16 +2,13 @@ package cheatahh.se.agent
 
 import cheatahh.se.integration.newDoorHandler
 import cheatahh.se.util.*
-import cheatahh.se.util.EntityCompanion
-import cheatahh.se.util.solidOffset
-import cheatahh.se.util.unsafe
+import dhbw.sose2022.softwareengineering.airportagentsim.simulation.api.AirportAgentSimulation
 import dhbw.sose2022.softwareengineering.airportagentsim.simulation.api.config.ConfigurableAttribute
 import dhbw.sose2022.softwareengineering.airportagentsim.simulation.api.geometry.Point
 import dhbw.sose2022.softwareengineering.airportagentsim.simulation.api.simulation.entity.Agent
 import dhbw.sose2022.softwareengineering.airportagentsim.simulation.simulation.SimulationWorld
 import kotlin.math.max
 import kotlin.math.min
-import kotlin.random.Random
 
 /**
  * The [MaliciousJanitor] Agent is classified as attacker.
@@ -31,6 +28,9 @@ import kotlin.random.Random
  *
  * */
 class MaliciousJanitor(initialSpeed: DoubleValue, tilePlacingChance: String, private val tileLifeTime: LongValue, private val tileWidth: IntValue, private val tileHeight: IntValue, private val tileSlowDownTime: LongValue, private val tileSlowDownCoolDown: LongValue, tileSlowDownFunction: String, excludedEntityTypes: String) : Agent() {
+
+    // Random
+    private val random = AirportAgentSimulation.getRandom(plugin)
 
     // Null-Safe logger
     private val logger = ContextLogger(plugin)
@@ -54,6 +54,18 @@ class MaliciousJanitor(initialSpeed: DoubleValue, tilePlacingChance: String, pri
 
     init {
         speed = initialSpeed.toDouble()
+        do {
+            try {
+                // Try to turn to a random point
+                turn(
+                    Point(
+                        random.nextInt(0, world.width),
+                        random.nextInt(0, world.height)
+                    )
+                )
+                break
+            } catch (_: Exception) {} // Rare condition, where the randomly generated point is the exact point we are currently standing on.
+        } while(true)
     }
 
     override fun onBirth() {
@@ -75,7 +87,12 @@ class MaliciousJanitor(initialSpeed: DoubleValue, tilePlacingChance: String, pri
             do {
                 try {
                     // Try to turn to a random point
-                    turn(Point(Random.nextInt(0, world.width), Random.nextInt(0, world.height)))
+                    turn(
+                        Point(
+                            random.nextInt(0, world.width),
+                            random.nextInt(0, world.height)
+                        )
+                    )
                     break
                 } catch (_: Exception) {} // Rare condition, where the randomly generated point is the exact point we are currently standing on.
             } while(true)
@@ -83,7 +100,7 @@ class MaliciousJanitor(initialSpeed: DoubleValue, tilePlacingChance: String, pri
         lastPosition = currentPosition
 
         // Place a SlowDownTile
-        if(Random.nextDouble() <= placingChance) {
+        if(random.nextDouble() <= placingChance) {
             if(currentPosition.x < world.width - 1 && currentPosition.y < world.height - 1) {
                 val tile = SlowDownTile(logger, tileLifeTime.toLong(), tileSlowDownTime.toLong(), tileSlowDownCoolDown.toLong(), slowDownFunction, excludedTypes)
                 unsafe.putBoolean(tile, solidOffset, false)
