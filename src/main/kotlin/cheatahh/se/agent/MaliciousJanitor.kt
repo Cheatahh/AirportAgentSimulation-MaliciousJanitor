@@ -7,8 +7,8 @@ import dhbw.sose2022.softwareengineering.airportagentsim.simulation.api.config.C
 import dhbw.sose2022.softwareengineering.airportagentsim.simulation.api.geometry.Point
 import dhbw.sose2022.softwareengineering.airportagentsim.simulation.api.simulation.entity.Agent
 import dhbw.sose2022.softwareengineering.airportagentsim.simulation.simulation.SimulationWorld
-import kotlin.math.max
-import kotlin.math.min
+import java.util.*
+import kotlin.math.*
 
 /**
  * The [MaliciousJanitor] Agent is classified as attacker.
@@ -30,7 +30,9 @@ import kotlin.math.min
 class MaliciousJanitor(initialSpeed: DoubleValue, tilePlacingChance: String, private val tileLifeTime: LongValue, private val tileWidth: IntValue, private val tileHeight: IntValue, private val tileSlowDownTime: LongValue, private val tileSlowDownCoolDown: LongValue, tileSlowDownFunction: String, excludedEntityTypes: String) : Agent() {
 
     // Random
-    private val random = AirportAgentSimulation.getRandom(plugin)
+    private val random = try {
+        AirportAgentSimulation.getRandom(plugin)
+    } catch (_: Throwable) { Random() }
 
     // Null-Safe logger
     private val logger = ContextLogger(plugin)
@@ -54,24 +56,22 @@ class MaliciousJanitor(initialSpeed: DoubleValue, tilePlacingChance: String, pri
 
     init {
         speed = initialSpeed.toDouble()
-        do {
-            try {
-                // Try to turn to a random point
-                turn(
-                    Point(
-                        random.nextInt(0, world.width),
-                        random.nextInt(0, world.height)
-                    )
-                )
-                break
-            } catch (_: Exception) {} // Rare condition, where the randomly generated point is the exact point we are currently standing on.
-        } while(true)
     }
 
     override fun onBirth() {
         // Ensure the underlying world is of the expected type -> Unsafe Api, temporary workaround
         require(world is SimulationWorld)
         logger.info("Hello World!")
+        do {
+            try {
+                // Try to turn to a random point
+                turn(Point(
+                    random.nextInt(0, world.width),
+                    random.nextInt(0, world.height)
+                ))
+                break
+            } catch (_: Exception) {} // Rare condition, where the randomly generated point is the exact point we are currently standing on.
+        } while(true)
     }
 
     // Move and place SlowDownTiles
@@ -82,17 +82,15 @@ class MaliciousJanitor(initialSpeed: DoubleValue, tilePlacingChance: String, pri
         // Open & close doors
         doorHandler(logger, world.entities, currentPosition, amplifiedSpeed)
 
-        // Move
-        if(lastPosition == currentPosition) {
+        // Move (Turn)
+        if(lastPosition .. currentPosition < amplifiedSpeed * 0.95 /* did not really move into the expected direction */) {
             do {
                 try {
                     // Try to turn to a random point
-                    turn(
-                        Point(
-                            random.nextInt(0, world.width),
-                            random.nextInt(0, world.height)
-                        )
-                    )
+                    turn(Point(
+                        random.nextInt(0, world.width),
+                        random.nextInt(0, world.height)
+                    ))
                     break
                 } catch (_: Exception) {} // Rare condition, where the randomly generated point is the exact point we are currently standing on.
             } while(true)
@@ -101,11 +99,13 @@ class MaliciousJanitor(initialSpeed: DoubleValue, tilePlacingChance: String, pri
 
         // Place a SlowDownTile
         if(random.nextDouble() <= placingChance) {
-            if(currentPosition.x < world.width - 1 && currentPosition.y < world.height - 1) {
+            if(currentPosition.x < world.width && currentPosition.y < world.height) {
                 val tile = SlowDownTile(logger, tileLifeTime.toLong(), tileSlowDownTime.toLong(), tileSlowDownCoolDown.toLong(), slowDownFunction, excludedTypes)
                 unsafe.putBoolean(tile, solidOffset, false)
                 world.runInjected(tile) {
-                    tile.spawn(world, currentPosition.x, currentPosition.y, tileWidth.toInt(), tileHeight.toInt())
+                    try {
+                        tile.spawn(world, currentPosition.x, currentPosition.y, tileWidth.toInt(), tileHeight.toInt())
+                    } catch (_: Throwable) {}
                 }
             }
         }

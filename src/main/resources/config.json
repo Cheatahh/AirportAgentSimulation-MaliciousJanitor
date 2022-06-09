@@ -1,7 +1,8 @@
 {
   "seed": 1337,
-  "width": 1048576,
-  "height": 1048576,
+  "width": 50000,
+  "height": 50000,
+  "duration": 5000,
   "placedEntities": [{
     "type": "MaliciousJanitor",
     "position": [512, 512],
@@ -9,12 +10,13 @@
     "height": 512,
     "generates": [],
     "pluginAttributes": {
-      "initialSpeed": 512,
-      "tilePlacingChance": "0.1%",
+      "initialSpeed": 256,
+      "tilePlacingChance": "1%",
       "tileWidth": 512,
       "tileHeight": 512,
-      "tileSlowDownTime": 600,
-      "tileSlowDownCoolDown": 600,
+      "tileLifeTime": 600,
+      "tileSlowDownTime": 1000,
+      "tileSlowDownCoolDown": 200,
       "tileSlowDownFunction": "1%"
     }
   }]
